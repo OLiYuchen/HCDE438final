@@ -221,6 +221,8 @@ body, html {
   align-items: center;
   gap: 10px;
   margin: 20px 0;
+  font-size: 40px;
+  max-width: 800px;
 }
 
 .mood-slider input {
@@ -381,4 +383,75 @@ body, html {
 .delete-button:hover {
   background-color: #9e79d2d0;
   color: white;
+}
+
+
+/* Sign-Out Button Styling */
+.sign-out-button {
+  position: absolute; /* Allows precise positioning */
+  top: 20px; /* Distance from the top of the screen */
+  right: 20px; /* Distance from the right edge of the screen */
+  background-color: #9e79d2a9; /* Match the theme color */
+  color: white; /* White text color */
+  border: none; /* Remove border */
+  border-radius: 5px; /* Rounded corners */
+  padding: 10px 20px; /* Button padding */
+  font-size: 1rem; /* Font size */
+  cursor: pointer; /* Pointer cursor on hover */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+  z-index: 1000; /* Ensure it stays on top of other elements */
+}
+
+.sign-out-button:hover {
+  background-color: #6235a2; /* Darker shade on hover */
+}
+
+/* Activity Selection Modal */
+.activity-selection {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  padding: 20px;
+  z-index: 1000;
+  width: 80%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.activity-selection h3 {
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+  color: #333333;
+}
+
+.activity-selection ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.activity-selection li {
+  font-size: 1rem;
+  color: #555555;
+  padding: 10px 15px;
+  margin: 5px 0;
+  border: 1px solid #cccccc;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.activity-selection li:hover {
+  background-color: #9e79d2a9; /* Adjust this color to match your theme */
+  color: white;
+  transform: scale(1.05);
+}
+
+.activity-selection li:active {
+  transform: scale(0.95);
 }

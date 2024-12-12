@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 function ReflectionPage({
   currentActivity,
@@ -10,11 +10,42 @@ function ReflectionPage({
   setReflectionTime,
   onSubmit,
   onCancel,
+  onBackToMain,
 }) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editableActivity, setEditableActivity] = useState(currentActivity);
+
+  const handleDoubleClick = () => {
+    setIsEditing(true);
+  };
+
+  const handleActivityChange = (e) => {
+    setEditableActivity(e.target.value);
+  };
+
+  const handleBlur = () => {
+    setIsEditing(false);
+  };
+
   return (
     <div className="reflection-container">
       <div className="reflection-box">
-        <h2>Log Reflection for "{currentActivity}"</h2>
+        <h2>
+          Log Reflection for{" "}
+          {isEditing ? (
+            <input
+              type="text"
+              value={editableActivity}
+              onChange={handleActivityChange}
+              onBlur={handleBlur}
+              autoFocus
+            />
+          ) : (
+            <span onDoubleClick={handleDoubleClick} style={{ cursor: "pointer" }}>
+              "{editableActivity}"
+            </span>
+          )}
+        </h2>
         <div className="mood-slider">
           <span role="img" aria-label="sad">
             😢
@@ -46,7 +77,7 @@ function ReflectionPage({
           <button onClick={onCancel}>Cancel</button>
         </div>
       </div>
-      <button className="bottom-left-button" onClick={onCancel}>
+      <button className="bottom-left-button" onClick={onBackToMain}>
         Back to Main Page
       </button>
     </div>
