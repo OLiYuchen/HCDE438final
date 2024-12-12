@@ -1,8 +1,13 @@
 import React, { useState } from "react";
+import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
+import Header from "./Header";
+import RandomActivities from "./RandomActivities";
+import FullActivityList from "./FullActivityList";
+import ReflectionPage from "./ReflectionPage";
+import ReflectionCollectionPage from "./ReflectionCollectionPage";
 import "./App.css";
 
 function App() {
-  // State to store the list of activities
   const [activities, setActivities] = useState([
     "Reading a book",
     "Yoga",
@@ -16,26 +21,22 @@ function App() {
     "Walking in the park",
   ]);
 
-  // State to store random activities for the main screen
-  const [randomActivities, setRandomActivities] = useState(getRandomActivities());
-
-  // State to toggle full activity list view
-  const [showFullList, setShowFullList] = useState(false);
-
-  // State to track the activity currently being logged
+  const [randomActivities, setRandomActivities] = useState(() =>
+    getRandomActivities()
+  );
   const [currentActivity, setCurrentActivity] = useState(null);
-
-  // State for mood slider and reflection text
+  const [reflections, setReflections] = useState({});
   const [mood, setMood] = useState(5);
   const [reflection, setReflection] = useState("");
+  const [reflectionTime, setReflectionTime] = useState("");
 
-  // Function to generate three random activities
+  const navigate = useNavigate();
+
   function getRandomActivities() {
     const shuffled = [...activities].sort(() => 0.5 - Math.random());
-    return shuffled.slice(0, 3);
+    return shuffled.slice(0, Math.min(3, activities.length));
   }
 
-  // Function to add a new activity
   const addActivity = () => {
     const newActivity = prompt("Enter a new activity:");
     if (newActivity && !activities.includes(newActivity)) {
@@ -43,129 +44,112 @@ function App() {
     }
   };
 
-  // Function to delete an activity
   const deleteActivity = (activityToDelete) => {
     setActivities(activities.filter((activity) => activity !== activityToDelete));
   };
 
-  // Function to handle reflection submission
   const submitReflection = () => {
-    alert(`Reflection for "${currentActivity}" logged:\nMood: ${mood}\nReflection: ${reflection}`);
-    setCurrentActivity(null); // Close the reflection page
-    setMood(5); // Reset mood slider
-    setReflection(""); // Reset reflection text
+    const newReflection = {
+      mood,
+      text: reflection,
+      time: reflectionTime || new Date().toLocaleString(),
+    };
+
+    setReflections((prev) => ({
+      ...prev,
+      [currentActivity]: prev[currentActivity]
+        ? [...prev[currentActivity], newReflection]
+        : [newReflection],
+    }));
+
+    setCurrentActivity(null);
+    setMood(5);
+    setReflection("");
+    setReflectionTime("");
+    navigate("/reflections");
+  };
+
+  const deleteReflection = (activity, index) => {
+    setReflections((prev) => ({
+      ...prev,
+      [activity]: prev[activity].filter((_, i) => i !== index),
+    }));
+  };
+
+  const editReflection = (activity, index, newReflection) => {
+    setReflections((prev) => ({
+      ...prev,
+      [activity]: prev[activity].map((r, i) =>
+        i === index ? newReflection : r
+      ),
+    }));
   };
 
   return (
     <div className="App">
-      {/* Title Bar */}
-      <header className="title-bar">
-        <h1 className="title">Solo Activity Inspiration</h1>
-        <p className="subtitle">
-          Discover fun, personalized activities to make your alone time more fulfilling!
-        </p>
-      </header>
-
-      {currentActivity ? (
-        // Reflection Page
-        <div className="reflection-container">
-          <h2>Log Reflection for "{currentActivity}"</h2>
-          <div className="mood-slider">
-            <span role="img" aria-label="sad">
-              😢
-            </span>
-            <input
-              type="range"
-              min="1"
-              max="10"
-              value={mood}
-              onChange={(e) => setMood(e.target.value)}
+      <Header />
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <RandomActivities
+              randomActivities={randomActivities}
+              onSelectActivity={(activity) => {
+                setCurrentActivity(activity);
+                navigate("/reflection");
+              }}
+              onViewFullList={() => navigate("/activities")}
             />
-            <span role="img" aria-label="happy">
-              😊
-            </span>
-          </div>
-          <textarea
-            className="reflection-box"
-            value={reflection}
-            onChange={(e) => setReflection(e.target.value)}
-            placeholder="Write your thoughts here..."
-            maxLength={200} // Limit reflection length to 200 characters
-          />
-          <div className="reflection-actions">
-            <button onClick={submitReflection}>Log Reflection</button>
-            <button onClick={() => setCurrentActivity(null)}>Cancel</button>
-          </div>
-        </div>
-      ) : !showFullList ? (
-        <>
-          {/* Main Content with Random Activities */}
-          <div className="container">
-            <div
-              className="square left-square"
-              onClick={() => setCurrentActivity(randomActivities[0])}
-            >
-              <p>{randomActivities[0]}</p>
-            </div>
-            <div
-              className="square center-square"
-              onClick={() => setCurrentActivity(randomActivities[1])}
-            >
-              <p>{randomActivities[1]}</p>
-            </div>
-            <div
-              className="square right-square"
-              onClick={() => setCurrentActivity(randomActivities[2])}
-            >
-              <p>{randomActivities[2]}</p>
-            </div>
-          </div>
-
-          {/* Bottom Left Button */}
-          <button
-            className="bottom-left-button"
-            onClick={() => setShowFullList(true)}
-          >
-            View Full Activity List
-          </button>
-        </>
-      ) : (
-        <>
-          {/* Full Activity List */}
-          <div className="full-list">
-            {activities.map((activity, index) => (
-              <div
-                className="activity-square"
-                key={index}
-                onClick={() => setCurrentActivity(activity)}
-              >
-                <p>{activity}</p>
-                <button
-                  className="delete-button"
-                  onClick={(e) => {
-                    e.stopPropagation(); // Prevent triggering the click event for the activity square
-                    deleteActivity(activity);
-                  }}
-                >
-                  Delete
-                </button>
-              </div>
-            ))}
-            <button className="add-button" onClick={addActivity}>
-              Add Activity
-            </button>
-          </div>
-          <button
-            className="bottom-left-button"
-            onClick={() => {
-              setRandomActivities(getRandomActivities());
-              setShowFullList(false);
-            }}
-          >
-            Back to Random Suggestions
-          </button>
-        </>
-      )}
+          }
+        />
+        <Route
+          path="/activities"
+          element={
+            <FullActivityList
+              activities={activities}
+              onAddActivity={addActivity}
+              onDeleteActivity={deleteActivity}
+              onSelectActivity={(activity) => {
+                setCurrentActivity(activity);
+                navigate("/reflection");
+              }}
+              onBack={() => navigate("/")}
+            />
+          }
+        />
+        <Route
+          path="/reflection"
+          element={
+            <ReflectionPage
+              currentActivity={currentActivity}
+              mood={mood}
+              setMood={setMood}
+              reflection={reflection}
+              setReflection={setReflection}
+              reflectionTime={reflectionTime}
+              setReflectionTime={setReflectionTime}
+              onSubmit={submitReflection}
+              onCancel={() => navigate("/reflections")}
+              onBackToMain={() => navigate("/")}
+            />
+          }
+        />
+        <Route
+          path="/reflections"
+          element={
+            <ReflectionCollectionPage
+              reflections={reflections}
+              onEdit={editReflection}
+              onDelete={deleteReflection}
+              onAddReflection={(activity) => {
+                setCurrentActivity(activity || "New Reflection");
+                navigate("/reflection");
+              }}
+              onBackToMain={() => navigate("/")}
+            />
+          }
+        />
+      </Routes>
     </div>
   );
 }

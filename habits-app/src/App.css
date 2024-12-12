@@ -20,7 +20,7 @@ body, html {
   top: 0;
   left: 0;
   width: 100%;
-  background-color: #4caf50;
+  background-color: #9e79d2d0;
   color: white;
   padding: 20px 0;
   text-align: center;
@@ -53,7 +53,7 @@ body, html {
 
 /* Base styles for squares */
 .square {
-  background-color: #4caf50;
+  background-color: #9e79d2d0;
   border-radius: 5px;
   display: flex;
   justify-content: center;
@@ -61,6 +61,11 @@ body, html {
   flex-shrink: 0; /* Prevent shrinking */
   width: 25%; /* Default proportional width */
   aspect-ratio: 1; /* Keep the square shape */
+  color:white;
+  font-size: 200%;
+  font-weight: bold;
+  padding: 10px;
+
 }
 
 /* Specific sizes for squares */
@@ -102,7 +107,7 @@ body, html {
   position: fixed;
   bottom: 20px; /* Distance from the bottom of the screen */
   left: 20px; /* Distance from the left of the screen */
-  background-color: #4caf50; /* Green background */
+  background-color: #9e79d2d0; /* Green background */
   color: white; /* White text */
   border: none;
   border-radius: 5px;
@@ -114,7 +119,7 @@ body, html {
 }
 
 .bottom-left-button:hover {
-  background-color: #388e3c; /* Darker green on hover */
+  background-color: #6235a2; /* Darker green on hover */
 }
 
 /* Full Activity List */
@@ -122,15 +127,14 @@ body, html {
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
-  justify-content: center;
-
+  justify-content: flex-start; /* Align squares to the left */
   margin-top: 100px;
   padding: 20px;
 }
 
 /* Activity Square */
 .activity-square {
-  background-color: #4caf50;
+  background-color: #9e79d2d0;
   color: white;
   border-radius: 5px;
   display: flex;
@@ -150,7 +154,7 @@ body, html {
 
 /* Delete Button */
 .delete-button {
-  background-color: #f44336; /* Red background */
+  background-color: #e9d3f8ef; 
   color: white;
   border: none;
   border-radius: 5px;
@@ -162,13 +166,13 @@ body, html {
 }
 
 .delete-button:hover {
-  background-color: #d32f2f; /* Darker red */
+  background-color: #6235a2; /* Darker red */
 }
 
 /* Add Activity Button */
 .add-button {
   margin-top: 20px;
-  background-color: #4caf50; /* Green background */
+  background-color: #9e79d2d0; /* Green background */
   color: white;
   border: none;
   border-radius: 5px;
@@ -179,21 +183,39 @@ body, html {
 }
 
 .add-button:hover {
-  background-color: #388e3c; /* Darker green */
+  background-color: #6235a2; /* Darker green */
 }
 
-
-/* Reflection Page */
+/* Reflection Container with Background Square */
 .reflection-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: calc(100vh - 120px); /* Full height minus title bar */
+  padding: 20px;
+}
+
+.reflection-box {
+  background-color: #ffffff; /* White background for contrast */
+  border-radius: 15px; /* Rounded corners for the square */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+  width: 400px; /* Fixed width */
+  padding: 50px; /* Inner padding */
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  height: calc(100vh - 120px); /* Adjust height below title bar */
-  padding: 20px;
   text-align: center;
+  gap: 5px;
 }
 
+/* Title Inside the Box */
+.reflection-box h2 {
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+  color: #333333; /* Darker text for contrast */
+}
+
+/* Mood Slider Styling */
 .mood-slider {
   display: flex;
   align-items: center;
@@ -205,33 +227,158 @@ body, html {
   width: 200px;
 }
 
-.reflection-box {
-  width: 80%;
-  max-width: 400px;
-  height: 100px;
+/* Input Fields Inside the Box */
+.reflection-box textarea,
+.reflection-box input {
+  width: 100%;
   margin: 10px 0;
   padding: 10px;
-  border: 1px solid #ccc;
+  border: 1px solid #9e79d2d0;
   border-radius: 5px;
   font-size: 1rem;
   resize: none;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
+/* Reflection Box Buttons */
 .reflection-actions {
   display: flex;
-  gap: 10px;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 20px;
 }
 
 .reflection-actions button {
-  background-color: #4caf50;
+  background-color: #9e79d2d0;
   color: white;
   border: none;
   border-radius: 5px;
   padding: 10px 20px;
+  font-size: 1rem;
   cursor: pointer;
+  transition: background-color 0.3s;
 }
 
 .reflection-actions button:hover {
-  background-color: #388e3c;
+  background-color: #6235a2; /* Darker green on hover */
+}
+
+/* Back Button at the Bottom */
+.bottom-left-button {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background-color: #9e79d2d0;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+}
+
+.bottom-left-button:hover {
+  background-color: #6235a2;
+}
+
+/* Reflection Collection Page */
+.reflection-collection {
+  margin-top: 120px; /* Offset from the title bar */
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.reflection-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: flex-start; /* Align items to the left */
+}
+
+.reflection-square {
+  background-color: #9e79d2d0;
+  color: white;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 200px; /* Larger square size */
+  height: 200px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  position: relative;
+  padding: 15px;
+  text-align: center;
+  
+}
+
+.reflection-square p {
+  margin: 2px 0; /* Reduce the vertical margin between lines */
+  line-height: 1.5; /* Adjust line height for tighter spacing */
+}
+
+
+.reflection-time {
+  font-size: 0.8rem; /* Smaller font size for the timestamp */
+  color: #ffffff; /* Light grey color for better distinction */
+  margin-top: 5px;
+}
+
+.reflection-preview {
+  font-size: 0.9rem; /* Slightly smaller than regular text */
+  margin: 5px 0;
+}
+
+.reflection-square .reflection-preview {
+  font-size: 0.9rem; /* Slightly smaller font size for preview */
+  margin: 5px 0;
+  flex-grow: 1; /* Allow preview to expand and occupy the middle space */
+  display: flex;
+  align-items: center; /* Center preview content vertically */
+  justify-content: center; /* Center preview content horizontally */
+}
+
+.add-reflection-button {
+  align-self: flex-start; /* Align button to the top-left */
+  background-color: #9e79d2d0;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  margin-bottom: 20px;
+}
+
+.add-reflection-button:hover {
+  background-color: #6235a2; /* Darker green on hover */
+}
+
+.reflection-actions {
+  display: flex;
+  justify-content: space-between;
+  width: 100%; /* Make buttons stretch across the square */
+  margin-top: 10px;
+}
+
+.edit-button,
+.delete-button {
+  background-color: #fff;
+  color: #9e79d2d0;
+  border: 1px solid #9e79d2d0;
+  border-radius: 5px;
+  padding: 5px;
+  cursor: pointer;
+  flex: 1; /* Equal button widths */
+  margin: 0 5px; /* Add spacing between buttons */
+  text-align: center;
+}
+
+.edit-button:hover,
+.delete-button:hover {
+  background-color: #9e79d2d0;
+  color: white;
 }
