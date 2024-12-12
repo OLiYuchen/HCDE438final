@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
-import { db, auth } from "./Firebase"; 
+import { db, auth } from "./Firebase";
 import { onAuthStateChanged } from "firebase/auth";
-import { doc, getDoc, setDoc, updateDoc, collection, addDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import Header from "./Header";
 import Login from "./Login";
 import Signup from "./Signup";
@@ -36,7 +36,7 @@ function App() {
   const [reflectionTime, setReflectionTime] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userId, setUserId] = useState(null);
-  const [selectingActivity, setSelectingActivity] = useState(false); // New state to handle activity selection
+  const [selectingActivity, setSelectingActivity] = useState(false);
 
   const navigate = useNavigate();
 
@@ -54,17 +54,23 @@ function App() {
           const userData = userSnapshot.data();
           setActivities(userData.activities || initialActivities);
           setReflections(userData.reflections || {});
+          setRandomActivities(getRandomActivities(userData.activities || initialActivities));
         } else {
+          // Initialize new user data
           await setDoc(userDoc, {
             activities: initialActivities,
             reflections: {},
           });
+          setActivities(initialActivities);
+          setReflections({});
+          setRandomActivities(getRandomActivities(initialActivities));
         }
-
-        setRandomActivities(getRandomActivities(initialActivities));
       } else {
         setIsAuthenticated(false);
         setUserId(null);
+        setActivities([]);
+        setReflections({});
+        setRandomActivities([]);
       }
     });
 
@@ -75,11 +81,14 @@ function App() {
   useEffect(() => {
     if (userId) {
       const userDoc = doc(db, "users", userId);
-      updateDoc(userDoc, { activities, reflections });
+      updateDoc(userDoc, { activities, reflections }).catch((error) => {
+        console.error("Error syncing to Firestore:", error);
+      });
     }
   }, [activities, reflections, userId]);
 
-  function getRandomActivities(activitiesList = activities) {
+  // Generate random activities
+  function getRandomActivities(activitiesList) {
     const shuffled = [...activitiesList].sort(() => 0.5 - Math.random());
     return shuffled.slice(0, Math.min(3, activitiesList.length));
   }
@@ -87,12 +96,14 @@ function App() {
   const addActivity = async () => {
     const newActivity = prompt("Enter a new activity:");
     if (newActivity && !activities.includes(newActivity)) {
-      setActivities([...activities, newActivity]);
+      const updatedActivities = [...activities, newActivity];
+      setActivities(updatedActivities);
     }
   };
 
   const deleteActivity = (activityToDelete) => {
-    setActivities(activities.filter((activity) => activity !== activityToDelete));
+    const updatedActivities = activities.filter((activity) => activity !== activityToDelete);
+    setActivities(updatedActivities);
   };
 
   const submitReflection = async () => {
@@ -116,11 +127,9 @@ function App() {
         return;
       }
 
-      // Get existing reflections for this activity
       const userData = userSnapshot.data();
       const existingReflections = userData.reflections || {};
 
-      // Update reflections for the activity
       const updatedReflections = {
         ...existingReflections,
         [currentActivity]: existingReflections[currentActivity]
@@ -128,20 +137,15 @@ function App() {
           : [newReflection],
       };
 
-      // Save updated reflections to Firestore
       await updateDoc(userDocRef, {
         reflections: updatedReflections,
       });
 
-      // Update local state
       setReflections(updatedReflections);
-
-      // Clear input fields
       setCurrentActivity(null);
       setMood(5);
       setReflection("");
-      setReflectionTime(""); // Reset the manual input
-
+      setReflectionTime("");
       navigate("/reflections");
     } catch (error) {
       console.error("Error adding reflection:", error);
@@ -149,33 +153,56 @@ function App() {
     }
   };
 
-  const deleteReflection = (activity, index) => {
-    setReflections((prev) => {
-      const updatedReflections = {
-        ...prev,
-        [activity]: prev[activity].filter((_, i) => i !== index),
-      };
+  const deleteReflection = async (activity, index) => {
+    const updatedReflections = { ...reflections };
+
+    if (updatedReflections[activity]) {
+      updatedReflections[activity].splice(index, 1);
+
       if (updatedReflections[activity].length === 0) {
         delete updatedReflections[activity];
       }
-      return updatedReflections;
-    });
+
+      setReflections(updatedReflections);
+
+      if (userId) {
+        const userDocRef = doc(db, "users", userId);
+        try {
+          await updateDoc(userDocRef, { reflections: updatedReflections });
+        } catch (error) {
+          console.error("Error deleting reflection:", error);
+          alert("Failed to delete reflection. Please try again.");
+        }
+      }
+    }
   };
 
-  const editReflection = (activity, index, newReflection) => {
-    setReflections((prev) => ({
-      ...prev,
-      [activity]: prev[activity].map((r, i) => (i === index ? newReflection : r)),
-    }));
+  const editReflection = async (activity, index, updatedReflection) => {
+    const updatedReflections = { ...reflections };
+    if (updatedReflections[activity]) {
+      updatedReflections[activity][index] = updatedReflection;
+
+      setReflections(updatedReflections);
+
+      if (userId) {
+        const userDocRef = doc(db, "users", userId);
+        try {
+          await updateDoc(userDocRef, { reflections: updatedReflections });
+        } catch (error) {
+          console.error("Error updating reflection:", error);
+          alert("Failed to update reflection. Please try again.");
+        }
+      }
+    }
   };
 
   const handleAddReflection = () => {
-    setSelectingActivity(true); // Trigger activity selection modal or dropdown
+    setSelectingActivity(true);
   };
 
   const handleSelectActivity = (activity) => {
     setCurrentActivity(activity);
-    setSelectingActivity(false); // Close the selection modal or dropdown
+    setSelectingActivity(false);
     navigate("/reflection");
   };
 
@@ -190,7 +217,7 @@ function App() {
     <div className="App">
       <Header />
       {isAuthenticated && (
-        <button className="sign-out-button" onClick={handleSignOut}>
+        <button className="sign-out-button fixed-top-right" onClick={handleSignOut}>
           Sign Out
         </button>
       )}
@@ -227,7 +254,7 @@ function App() {
                   setCurrentActivity(activity);
                   navigate("/reflection");
                 }}
-                onAddReflection={handleAddReflection} // Update to handle reflection
+                onAddReflection={handleAddReflection}
                 onViewFullList={() => navigate("/activities")}
               />
             ) : (

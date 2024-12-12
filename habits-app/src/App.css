@@ -388,7 +388,7 @@ body, html {
 
 /* Sign-Out Button Styling */
 .sign-out-button {
-  position: absolute; /* Allows precise positioning */
+  position: fixed; /* Allows precise positioning */
   top: 20px; /* Distance from the top of the screen */
   right: 20px; /* Distance from the right edge of the screen */
   background-color: #9e79d2a9; /* Match the theme color */
